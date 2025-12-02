@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Add Transaction</h2>
+
+<form method="POST">
+    <select name="type" class="form-control">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+    </select><br>
+
+    <input name="category" class="form-control" placeholder="Category"><br>
+    <input name="amount" class="form-control" placeholder="Amount" type="number"><br>
+
+    <button class="btn btn-success">Add</button>
+</form>
+
+{% endblock %}

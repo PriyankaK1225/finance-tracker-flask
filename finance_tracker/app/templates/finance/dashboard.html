@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">Dashboard</h2>
+
+<a href="{{ url_for('finance.add_transaction') }}" class="btn btn-primary mb-3">
+    + Add Transaction
+</a>
+
+<!-- ===== SUMMARY CARDS ===== -->
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="card text-white bg-success mb-3 shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Income</h5>
+                <h3>₹ {{ income }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card text-white bg-danger mb-3 shadow">
+            <div class="card-body">
+                <h5 class="card-title">Total Expense</h5>
+                <h3>₹ {{ expense }}</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== PIE CHART ===== -->
+<div class="card p-4 shadow mt-4" style="max-width: 400px; margin: auto;">
+    <h4 class="mb-3">Expenses by Category</h4>
+    <canvas id="categoryChart" height="80"></canvas>
+</div>
+
+<!-- ===== CATEGORY TABLE ===== -->
+<h4 class="mt-5">Category-wise Summary</h4>
+<div class="card p-3 shadow mb-4">
+    <table class="table table-bordered">
+        <tr>
+            <th>Category</th>
+            <th>Total</th>
+        </tr>
+        {% for cat, total in category_summary %}
+        <tr>
+            <td>{{ cat }}</td>
+            <td>₹ {{ total }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+</div>
+
+<!-- ===== TRANSACTION LIST ===== -->
+<h4>Your Transactions</h4>
+<div class="card p-3 shadow">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for txn in transactions %}
+        <tr>
+            <td>{{ txn.date }}</td>
+            <td>{{ txn.category }}</td>
+            <td>{{ txn.type }}</td>
+            <td>{{ txn.amount }}</td>
+            <td>{{ txn.description }}</td>
+            <td>
+                <a href="{{ url_for('finance.edit_transaction', id=txn.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{{ url_for('finance.delete_transaction', id=txn.id) }}" class="btn btn-danger btn-sm"
+                   onclick="return confirm('Delete transaction?')">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+<!-- ===== CHART.JS SCRIPT ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('categoryChart');
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ categories | tojson | safe }},
+            datasets: [{
+                data: {{ totals | tojson | safe }},
+                backgroundColor: [
+                    "#3498db",
+                    "#e74c3c",
+                    "#f1c40f",
+                    "#2ecc71",
+                    "#9b59b6",
+                    "#1abc9c"
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
+
+{% endblock %}
